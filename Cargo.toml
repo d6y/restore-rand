@@ -1,0 +1,13 @@
+[package]
+name = "restore-rand"
+version = "0.1.0"
+authors = ["Richard Dallaway <richard@dallaway.com>"]
+edition = "2018"
+
+
+[dependencies]
+rand_pcg = { version = "0.2", features=["serde1"] }
+rand = "0.7"
+structopt = "0.3"
+serde = "1.0"
+serde_json = "1.0"
