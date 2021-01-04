@@ -1,23 +1,38 @@
 # Test of restoring random number state
 
-Thank you to mbrubeck for solving this for me on [users.rust-lang.org]( https://users.rust-lang.org/t/saving-and-restoring-the-state-of-a-seedablerng/52642/2?u=d6y)
+By default, this code runs 10,000 steps of random number generation.
+With a fixed seed (default: 1), the result will always be the same.
 
-When run with just a seed:
+After each step, the code saves state to disk.
+Interrupt the programme (ctrl-c), and run it again: the code should pick up where it left off, producing the same result as if it were not interrupted.
 
-```
-cargo run -- --seed 1
-```
-
-...will run two random calculations, 
-saving the state after the first step (as `checkpoint-seed-1-step-1.json`).
-
-Run again, but restoring state:
+Example:
 
 ```
-cargo run -- --seed 9999 --restore-checkpoint checkpoint-seed-1-step-1.json
+% cargo run | tail -2                                                                            [master]
+    Finished dev [unoptimized + debuginfo] target(s) in 0.03s
+     Running `target/debug/restore-rand`
+iteration 9999, 461
+Run complete; cleaning up
 ```
 
-...and this will restore the random state and just run the second step.
+The 461 number is the result of some random calculation.
 
-The output for Step 2 should be the same in both cases.
+Re-run again, but interrupt. The state will be saved on disk and reloaded:
 
+```
+% cargo run
+(much output)
+iteration 8604, 469
+iteration 8605, 425
+^C
+
+% cargo run 
+Settings { seed: 1, num_iter: 10000 }
+Running from step 8606
+(much output)
+iteration 9999, 461
+Run complete; cleaning up
+```
+
+Thank you to mbrubeck for pointing me at the pcg crate for serializing random number state, on [users.rust-lang.org]( https://users.rust-lang.org/t/saving-and-restoring-the-state-of-a-seedablerng/52642/2?u=d6y)
